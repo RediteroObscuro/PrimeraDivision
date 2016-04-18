@@ -1,0 +1,530 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<style>
+			.draw {
+				padding-left: 5px !important;
+			}
+			.container {
+				margin-bottom: 200px;
+			}
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-default text-center">
+			<h2>JUGÁ CON LOS RESULTADOS</h2>
+		</nav>
+		<div class="container">
+			<div class="row" id="tables"></div>
+			<div id="weeks"></div>
+		</div>
+	</body>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.25.8/js/jquery.tablesorter.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script>
+		var LOCAL = 0,
+			VISITANTE = 1,
+			EMPATE = 2;
+
+		var CURRENT_WEEK;
+
+		var teams = [
+			[ // zone 1
+				'Arsenal', // 0
+				'Banfield', // 1
+				'Belgrano', // 2
+				'Colon', // 3
+				'Gimnasia', // 4
+				'Godoy Cruz', // 5
+				'Independiente', // 6
+				'Olimpo', // 7
+				'Patronato', // 8
+				'Quilmes', // 9
+				'River Plate', // 10
+				'Rosario Central', // 11
+				'San Lorenzo', // 12
+				'Sarmiento', // 13
+				'Velez', // 14
+			],
+			[ // zone 2
+				'Aldosivi', // 0
+				'Argentinos', // 1
+				'Atlético Rafaela', // 2
+				'Atlético Tucumán', // 3
+				'Boca Juniors', // 4
+				'Defensa y Justicia', // 5
+				'Estudiantes', // 6
+				'Huracán', // 7
+				'Lanús', // 8
+				'Newell\'s', // 9
+				'Racing Club', // 10
+				'San Martín', // 11
+				'Temperley', // 12
+				'Tigre', // 13
+				'Unión', //  14
+			]
+		]
+
+		var ARSENAL = teams[0][0],
+			BANFIELD = teams[0][1],
+			BELGRANO = teams[0][2],
+			COLON = teams[0][3],
+			GIMNASIA = teams[0][4],
+			GODOY_CRUZ = teams[0][5],
+			INDEPENDIENTE = teams[0][6],
+			OLIMPO = teams[0][7],
+			PATRONATO = teams[0][8],
+			QUILMES = teams[0][9],
+			RIVER_PLATE = teams[0][10],
+			ROSARIO_CENTRAL = teams[0][11],
+			SAN_LORENZO = teams[0][12],
+			SARMIENTO = teams[0][13],
+			VELEZ = teams[0][14];
+
+		var ALDOSIVI = teams[1][0],
+			ARGENTINOS = teams[1][1],
+			ATLETICO_RAFAELA = teams[1][2],
+			ATLETICO_TUCUMAN = teams[1][3],
+			BOCA_JUNIORS = teams[1][4],
+			DEFENSA_Y_JUSTICIA = teams[1][5],
+			ESTUDIANTES = teams[1][6],
+			HURACAN = teams[1][7],
+			LANUS = teams[1][8],
+			NEWELLS = teams[1][9],
+			RACING_CLUB = teams[1][10],
+			SAN_MARTIN = teams[1][11],
+			TEMPERLEY = teams[1][12],
+			TIGRE = teams[1][13],
+			UNION = teams[1][14];
+
+		var weeks = [
+			[ // week 1
+				[ HURACAN, ATLETICO_RAFAELA, VISITANTE ],
+				[ BANFIELD, GIMNASIA, LOCAL],
+				[ ROSARIO_CENTRAL, GODOY_CRUZ, LOCAL],
+				[ ALDOSIVI, OLIMPO, LOCAL],
+				[ ARGENTINOS, TIGRE, EMPATE],
+				[ PATRONATO, SAN_LORENZO, EMPATE],
+				[ SAN_MARTIN, NEWELLS, LOCAL],
+				[ TEMPERLEY, BOCA_JUNIORS, EMPATE],
+				[ INDEPENDIENTE, BELGRANO, LOCAL],
+				[ DEFENSA_Y_JUSTICIA, UNION, EMPATE],
+				[ COLON, ARSENAL, LOCAL],
+				[ ATLETICO_TUCUMAN, RACING_CLUB, LOCAL],
+				[ ESTUDIANTES, LANUS, VISITANTE],
+				[ RIVER_PLATE, QUILMES, LOCAL],
+				[ SARMIENTO, VELEZ, LOCAL]
+			],
+			[ // week 2
+				[ ARSENAL, BANFIELD, LOCAL],
+				[ UNION, TEMPERLEY, LOCAL],
+				[ GODOY_CRUZ, INDEPENDIENTE, EMPATE],
+				[ QUILMES, COLON, VISITANTE],
+				[ ALDOSIVI, ARGENTINOS, LOCAL],
+				[ ATLETICO_RAFAELA, ESTUDIANTES, VISITANTE],
+				[ SAN_LORENZO, SARMIENTO, LOCAL],
+				[ RACING_CLUB, SAN_MARTIN, EMPATE],
+				[ VELEZ, OLIMPO, LOCAL],
+				[ ROSARIO_CENTRAL, NEWELLS, LOCAL],
+				[ LANUS, DEFENSA_Y_JUSTICIA, LOCAL],
+				[ GIMNASIA, PATRONATO, LOCAL],
+				[ BOCA_JUNIORS, ATLETICO_TUCUMAN, VISITANTE],
+				[ BELGRANO, RIVER_PLATE, LOCAL],
+				[ TIGRE, HURACAN, VISITANTE]
+			],
+			[ // week 3
+				[ BANFIELD, QUILMES, EMPATE],
+				[ OLIMPO, SAN_LORENZO, VISITANTE],
+				[ ARGENTINOS, VELEZ, VISITANTE],
+				[ DEFENSA_Y_JUSTICIA, ATLETICO_RAFAELA, LOCAL],
+				[ NEWELLS, RACING_CLUB, LOCAL],
+				[ PATRONATO, ARSENAL, EMPATE],
+				[ INDEPENDIENTE, ROSARIO_CENTRAL, VISITANTE],
+				[ SAN_MARTIN, BOCA_JUNIORS, VISITANTE],
+				[ SARMIENTO, GIMNASIA, VISITANTE],
+				[ ESTUDIANTES, TIGRE, EMPATE],
+				[ COLON, BELGRANO, LOCAL],
+				[ TEMPERLEY, LANUS, VISITANTE],
+				[ ATLETICO_TUCUMAN, UNION, LOCAL],
+				[ RIVER_PLATE, GODOY_CRUZ, VISITANTE],
+				[ HURACAN, ALDOSIVI, LOCAL]
+			],
+			[ // week 4
+				[ SAN_LORENZO, VELEZ, LOCAL],
+				[ GIMNASIA, OLIMPO, LOCAL],
+				[ BOCA_JUNIORS, NEWELLS, LOCAL],
+				[ TIGRE, DEFENSA_Y_JUSTICIA, VISITANTE],
+				[ BELGRANO, BANFIELD, EMPATE],
+				[ INDEPENDIENTE, RACING_CLUB, EMPATE],
+				[ GODOY_CRUZ, COLON, LOCAL],
+				[ ROSARIO_CENTRAL, RIVER_PLATE, EMPATE],
+				[ QUILMES, PATRONATO, EMPATE],
+				[ ARSENAL, SARMIENTO, LOCAL],
+				[ UNION, SAN_MARTIN, EMPATE],
+				[ ATLETICO_RAFAELA, TEMPERLEY, VISITANTE],
+				[ LANUS, ATLETICO_TUCUMAN, LOCAL],
+				[ ALDOSIVI, ESTUDIANTES, VISITANTE],
+				[ ARGENTINOS, HURACAN, EMPATE]
+			],
+			[ // week 5
+				[ NEWELLS, UNION, EMPATE],
+				[ BANFIELD, GODOY_CRUZ, VISITANTE],
+				[ ESTUDIANTES, ARGENTINOS, LOCAL],
+				[ SARMIENTO, QUILMES, EMPATE],
+				[ DEFENSA_Y_JUSTICIA, ALDOSIVI, LOCAL],
+				[ HURACAN, SAN_LORENZO, EMPATE],
+				[ PATRONATO, BELGRANO, LOCAL],
+				[ COLON, ROSARIO_CENTRAL, VISITANTE],
+				[ ATLETICO_TUCUMAN, ATLETICO_RAFAELA, LOCAL],
+				[ RACING_CLUB, BOCA_JUNIORS, LOCAL],
+				[ OLIMPO, ARSENAL, LOCAL],
+				[ SAN_MARTIN, LANUS, EMPATE],
+				[ VELEZ, GIMNASIA, LOCAL],
+				[ RIVER_PLATE, INDEPENDIENTE, LOCAL],
+				[ TEMPERLEY, TIGRE, LOCAL]
+			],
+			[ // week 6
+				[ QUILMES, OLIMPO, EMPATE],
+				[ ARGENTINOS, DEFENSA_Y_JUSTICIA, VISITANTE],
+				[ ARSENAL, VELEZ, LOCAL],
+				[ LANUS, NEWELLS, LOCAL],
+				[ HURACAN,ESTUDIANTES, LOCAL],
+				[ ATLETICO_RAFAELA, SAN_MARTIN, VISITANTE],
+				[ BELGRANO, SARMIENTO, LOCAL],
+				[ GIMNASIA, SAN_LORENZO, EMPATE],
+				[ INDEPENDIENTE, COLON, LOCAL],
+				[ RIVER_PLATE, BOCA_JUNIORS, EMPATE],
+				[ ROSARIO_CENTRAL, BANFIELD, EMPATE],
+				[ ALDOSIVI, TEMPERLEY, EMPATE],
+				[ UNION, RACING_CLUB, VISITANTE],
+				[ TIGRE, ATLETICO_TUCUMAN, LOCAL],
+				[ GODOY_CRUZ, PATRONATO, LOCAL]
+			],
+			[ // week 7
+				[ RACING_CLUB, LANUS, LOCAL],
+				[ NEWELLS, ATLETICO_RAFAELA, EMPATE],
+				[ OLIMPO, BELGRANO, LOCAL],
+				[ DEFENSA_Y_JUSTICIA, HURACAN, VISITANTE],
+				[ SAN_MARTIN, TIGRE, LOCAL],
+				[ BANFIELD, INDEPENDIENTE, VISITANTE],
+				[ SAN_LORENZO, ARSENAL, VISITANTE],
+				[ TEMPERLEY, ARGENTINOS, EMPATE],
+				[ PATRONATO, ROSARIO_CENTRAL, LOCAL],
+				[ ESTUDIANTES, GIMNASIA, LOCAL],
+				[ ATLETICO_TUCUMAN, ALDOSIVI, EMPATE],
+				[ COLON, RIVER_PLATE, LOCAL],
+				[ SARMIENTO, GODOY_CRUZ, EMPATE],
+				[ BOCA_JUNIORS, UNION, LOCAL],
+				[ VELEZ, QUILMES, VISITANTE]
+			],
+			[ // week 8
+				[ ALDOSIVI, SAN_MARTIN, EMPATE],
+				[ ARSENAL, GIMNASIA, VISITANTE],
+				[ ESTUDIANTES, DEFENSA_Y_JUSTICIA, LOCAL],
+				[ BELGRANO, VELEZ, VISITANTE],
+				[ COLON, UNION, VISITANTE],
+				[ GODOY_CRUZ, OLIMPO, LOCAL],
+				[ ARGENTINOS, ATLETICO_TUCUMAN, VISITANTE],
+				[ INDEPENDIENTE, PATRONATO, LOCAL],
+				[ QUILMES, SAN_LORENZO, LOCAL],
+				[ RIVER_PLATE, BANFIELD, EMPATE],
+				[ HURACAN, TEMPERLEY, LOCAL],
+				[ LANUS, BOCA_JUNIORS, LOCAL],
+				[ ROSARIO_CENTRAL, SARMIENTO, LOCAL],
+				[ ATLETICO_RAFAELA, RACING_CLUB, VISITANTE],
+				[ TIGRE, NEWELLS, EMPATE]
+			],
+			[ // week 9
+				[ ATLETICO_TUCUMAN, HURACAN, LOCAL],
+				[ TEMPERLEY, ESTUDIANTES, VISITANTE],
+				[ OLIMPO, ROSARIO_CENTRAL, EMPATE],
+				[ RACING_CLUB, TIGRE, EMPATE],
+				[ BOCA_JUNIORS, ATLETICO_RAFAELA, LOCAL],
+				[ PATRONATO, RIVER_PLATE, LOCAL],
+				[ BANFIELD, COLON, EMPATE],
+				[ NEWELLS, ALDOSIVI, EMPATE],
+				[ SAN_LORENZO, BELGRANO, LOCAL],
+				[ SAN_MARTIN, ARGENTINOS, LOCAL],
+				[ DEFENSA_Y_JUSTICIA, ARSENAL, VISITANTE],
+				[ VELEZ, GODOY_CRUZ, VISITANTE],
+				[ SARMIENTO, INDEPENDIENTE, EMPATE],
+				[ GIMNASIA, QUILMES, LOCAL],
+				[ UNION, LANUS, VISITANTE]
+			],
+			[ // week 10
+				[ COLON, PATRONATO, EMPATE],
+				[ GODOY_CRUZ, SAN_LORENZO, VISITANTE],
+				[ HURACAN, SAN_MARTIN, LOCAL],
+				[ RIVER_PLATE, SARMIENTO, EMPATE],
+				[ DEFENSA_Y_JUSTICIA, TEMPERLEY, LOCAL],
+				[ INDEPENDIENTE, OLIMPO, EMPATE],
+				[ BANFIELD, LANUS, VISITANTE],
+				[ ARGENTINOS, NEWELLS, EMPATE],
+				[ ROSARIO_CENTRAL, VELEZ, VISITANTE],
+				[ ALDOSIVI, RACING_CLUB, LOCAL],
+				[ TIGRE, BOCA_JUNIORS, LOCAL],
+				[ BELGRANO, GIMNASIA, LOCAL],
+				[ QUILMES, ARSENAL, VISITANTE],
+				[ ATLETICO_RAFAELA, UNION, EMPATE],
+				[ ESTUDIANTES, ATLETICO_TUCUMAN, LOCAL]
+			],
+			[ // week 11
+				[ SARMIENTO, COLON, LOCAL],
+				[ GIMNASIA, GODOY_CRUZ, EMPATE],
+				[ LANUS, ATLETICO_RAFAELA, LOCAL],
+				[ ATLETICO_TUCUMAN, DEFENSA_Y_JUSTICIA, LOCAL],
+				[ NEWELLS, HURACAN, LOCAL],
+				[ UNION, TIGRE, LOCAL],
+				[ BOCA_JUNIORS, ALDOSIVI, LOCAL],
+				[ RACING_CLUB, ARGENTINOS, EMPATE],
+				[ SAN_LORENZO, ROSARIO_CENTRAL, LOCAL],
+				[ TEMPERLEY, QUILMES, LOCAL],
+				[ SAN_MARTIN, ESTUDIANTES, VISITANTE],
+				[ VELEZ, INDEPENDIENTE, VISITANTE],
+				[ PATRONATO, BANFIELD, VISITANTE],
+				[ OLIMPO, RIVER_PLATE, VISITANTE],
+				[ ARSENAL, BELGRANO, ]
+			],
+			[ // week 12
+				[ ATLETICO_RAFAELA, PATRONATO, ],
+				[ VELEZ, ARGENTINOS, ],
+				[ OLIMPO, ALDOSIVI, ],
+				[ UNION, COLON, ],
+				[ ARSENAL, DEFENSA_Y_JUSTICIA, ],
+				[ SAN_LORENZO, HURACAN, ],
+				[ GODOY_CRUZ, SAN_MARTIN, ],
+				[ LANUS, BANFIELD, ],
+				[ GIMNASIA, ESTUDIANTES, ],
+				[ NEWELLS, ROSARIO_CENTRAL, ],
+				[ BOCA_JUNIORS, RIVER_PLATE, ],
+				[ RACING_CLUB, INDEPENDIENTE, ],
+				[ BELGRANO, ATLETICO_TUCUMAN, ],
+				[ TIGRE, SARMIENTO, ],
+				[ QUILMES, TEMPERLEY, ]
+			],
+			[ // week 13
+				[ ALDOSIVI, UNION, ],
+				[ TEMPERLEY, ATLETICO_TUCUMAN, ],
+				[ ROSARIO_CENTRAL, GIMNASIA, ],
+				[ RIVER_PLATE, VELEZ, ],
+				[ PATRONATO, ATLETICO_RAFAELA, ],
+				[ INDEPENDIENTE, SAN_LORENZO, ],
+				[ HURACAN, RACING_CLUB, ],
+				[ GODOY_CRUZ, ARSENAL, ],
+				[ ESTUDIANTES, NEWELLS, ],
+				[ DEFENSA_Y_JUSTICIA, SAN_MARTIN, ],
+				[ COLON, OLIMPO, ],
+				[ BELGRANO, QUILMES, ],
+				[ BANFIELD, SARMIENTO, ],
+				[ ARGENTINOS, BOCA_JUNIORS, ],
+				[ TIGRE, LANUS, ]
+			],
+			[ // week 14
+				[ ARSENAL, ROSARIO_CENTRAL, ],
+				[ UNION, ARGENTINOS, ],
+				[ SARMIENTO, PATRONATO, ],
+				[ SAN_MARTIN, TEMPERLEY, ],
+				[ SAN_LORENZO, RIVER_PLATE, ],
+				[ RACING_CLUB, ESTUDIANTES, ],
+				[ QUILMES, GODOY_CRUZ, ],
+				[ OLIMPO, BANFIELD, ],
+				[ NEWELLS, DEFENSA_Y_JUSTICIA, ],
+				[ LANUS, ALDOSIVI, ],
+				[ GIMNASIA, INDEPENDIENTE, ],
+				[ BOCA_JUNIORS, HURACAN, ],
+				[ ATLETICO_TUCUMAN, BELGRANO, ],
+				[ ATLETICO_RAFAELA, TIGRE, ],
+				[ VELEZ, COLON, ]
+			],
+			[ // week 15
+				[ ALDOSIVI, ATLETICO_RAFAELA, ],
+				[ SARMIENTO, TIGRE, ],
+				[ ROSARIO_CENTRAL, QUILMES, ],
+				[ RIVER_PLATE, GIMNASIA, ],
+				[ PATRONATO, OLIMPO, ],
+				[ INDEPENDIENTE, ARSENAL, ],
+				[ HURACAN, UNION, ],
+				[ GODOY_CRUZ, BELGRANO, ],
+				[ ESTUDIANTES, BOCA_JUNIORS, ],
+				[ DEFENSA_Y_JUSTICIA, RACING_CLUB, ],
+				[ COLON, SAN_LORENZO, ],
+				[ BANFIELD, VELEZ, ],
+				[ ATLETICO_TUCUMAN, SAN_MARTIN, ],
+				[ ARGENTINOS, LANUS, ],
+				[ TEMPERLEY, NEWELLS, ]
+			],
+			[ // week 16
+				[ ARSENAL, RIVER_PLATE, ],
+				[ UNION, ESTUDIANTES, ],
+				[ TIGRE, ALDOSIVI, ],
+				[ SAN_MARTIN, GODOY_CRUZ, ],
+				[ SAN_LORENZO, BANFIELD, ],
+				[ RACING_CLUB, TEMPERLEY, ],
+				[ QUILMES, INDEPENDIENTE, ],
+				[ OLIMPO, SARMIENTO, ],
+				[ NEWELLS, ATLETICO_TUCUMAN, ],
+				[ LANUS, HURACAN, ],
+				[ GIMNASIA, COLON, ],
+				[ BOCA_JUNIORS, DEFENSA_Y_JUSTICIA, ],
+				[ BELGRANO, ROSARIO_CENTRAL, ],
+				[ ATLETICO_RAFAELA, ARGENTINOS, ],
+				[ VELEZ, PATRONATO, ]
+			]
+		]
+
+		function createTable() {
+			$('#tables').empty();
+			$('#tables').html('<div class="col-md-6"><table id="zona1" class="tablesorter table table-striped table-bordered"><thead><tr><th>Equipo</th><th>Puntos</th></tr></thead><tbody id="body1"></tbody></table></div><div class="col-md-6"><table id="zona2" class="tablesorter table table-striped table-bordered"><thead><tr><th>Equipo</th><th>Puntos</th></tr></thead><tbody id="body2"></tbody></table></div>');
+
+			var winners = [],
+				draws = [];
+
+			var wTable = {},
+				dTable = {};
+
+			for(var w = 0; w < weeks.length; w++) {
+				var result = undefined;
+				for(var m = 0; m < 15; m++) {
+					result = weeks[w][m][2];
+					if(result === undefined) {
+						CURRENT_WEEK = w;
+						break;
+					}
+					if(result !== EMPATE) {
+						winners.push(weeks[w][m][weeks[w][m][2]]);
+					} else {
+						draws.push(weeks[w][m][LOCAL]);
+						draws.push(weeks[w][m][VISITANTE]);
+					}
+				}
+				if(result === undefined) {
+					break;
+				}
+			}
+
+			winners.forEach(function(element) {
+				wTable[element] = (wTable[element] || 0) + 1;
+			});
+
+			draws.forEach(function(element) {
+				dTable[element] = (dTable[element] || 0) + 1;
+			});
+
+			var table = document.getElementById('zona1').getElementsByTagName('tbody')[0];
+			for(var i = 0; i < teams[0].length; i++) {
+
+				var row = table.insertRow(-1);
+				var cell1 = row.insertCell(0);
+				var cell2 = row.insertCell(1);
+
+				var name = teams[0][i];
+				var win = wTable[name] * 3;
+				if( wTable[name] === undefined) win = 0;
+				var draw = dTable[name];
+				if(dTable[name] === undefined) draw = 0;
+
+				var points = win + draw;
+				cell1.innerHTML = name;
+				cell2.innerHTML = points;
+			}
+
+			table = document.getElementById('zona2').getElementsByTagName('tbody')[0];
+			for(var i = 0; i < teams[1].length; i++) {
+
+				var row = table.insertRow(-1);
+				var cell1 = row.insertCell(0);
+				var cell2 = row.insertCell(1);
+
+				var name = teams[1][i];
+				var win = wTable[name] * 3;
+				if( wTable[name] === undefined) win = 0;
+				var draw = dTable[name];
+				if(dTable[name] === undefined) draw = 0;
+
+				var points = win + draw;
+				cell1.innerHTML = name;
+				cell2.innerHTML = points;
+			}
+
+
+			$("#zona1").tablesorter({sortList: [[1,1]] });
+			$("#zona2").tablesorter({sortList: [[1,1]] });
+
+			return 1;
+		}
+
+		createTable();
+
+
+		var html = '<div class="row">';
+
+		for(var i = CURRENT_WEEK; i < weeks.length; i++) {
+			html = '';
+			var list_local = '';
+			var list_visitante = '';
+			var list_empate = '';
+
+			var ro = i + 1;
+
+			html += '<div class="col-md-6"style="padding-top: 50px;"><div class="panel panel-default" id="' + i + '"><div class="panel-heading">Fecha ' + ro + '</div></div><div class="col-md-5">';
+
+			for(var m = 0; m < 15; m++) {
+				var data_l = '';
+				if(weeks[i][m][2] == undefined) data_l = 'data-week="' + i + '" data-match="' + m + '" data-winner="' + LOCAL + '"';
+				var data_e = '';
+				if(weeks[i][m][2] == undefined) data_e = 'data-week="' + i + '" data-match="' + m + '" data-winner="' + EMPATE + '"';
+				var data_v = '';
+				if(weeks[i][m][2] == undefined) data_v = 'data-week="' + i + '" data-match="' + m + '" data-winner="' + VISITANTE + '"';
+
+				(weeks[i][m][2] == LOCAL)
+					?
+						list_local += '<a href="#' + i + '" class="list-group-item disabled">' + weeks[i][m][0] + '</a>'
+					:
+						list_local += '<a href="#' + i + '" class="choice list-group-item" ' + data_l + '>' + weeks[i][m][0] + '</a>';
+				(weeks[i][m][2] == EMPATE)
+					?
+						list_empate += '<a href="#' + i + '" class="list-group-item disabled draw">X</a>'
+					:
+						list_empate += '<a href="#' + i + '" class="choice list-group-item draw" ' + data_e + '>X</a>';
+				(weeks[i][m][2] == VISITANTE)
+					?
+						list_visitante += '<a href="#' + i + '" class="list-group-item disabled">' + weeks[i][m][1] + '</a>'
+					:
+						list_visitante += '<a href="#' + i + '" class="choice list-group-item" ' + data_v + '>' + weeks[i][m][1] + '</a>';
+			}
+
+			html += list_local + '</div>';
+			html += '<div class="col-md-1">' + list_empate + '</div>';
+			html += '<div class="col-md-5">' + list_visitante + '</div>';
+
+			$('#weeks').append(html + '<br/>');
+		}
+		html += '</div>';
+
+		$('.choice').click(function(e) {
+			var item = e.target;
+			var week = item.getAttribute("data-week");
+			var match = item.getAttribute("data-match");
+			var winner = Number(item.getAttribute("data-winner"));
+
+			weeks[week][match][2] = winner;
+
+			$(item).addClass('list-group-item-success');
+
+			if(winner == LOCAL) {
+				$('a[data-week=' + week + '][data-match=' + match + '][data-winner=' + VISITANTE + ']').removeClass('list-group-item-success');
+				$('a[data-week=' + week + '][data-match=' + match + '][data-winner=' + EMPATE + ']').removeClass('list-group-item-success');
+			} else if(winner == VISITANTE) {
+				$('a[data-week=' + week + '][data-match=' + match + '][data-winner=' + LOCAL + ']').removeClass('list-group-item-success');
+				$('a[data-week=' + week + '][data-match=' + match + '][data-winner=' + EMPATE + ']').removeClass('list-group-item-success');
+			} else if(winner == EMPATE) {
+				$('a[data-week=' + week + '][data-match=' + match + '][data-winner=' + VISITANTE + ']').removeClass('list-group-item-success');
+				$('a[data-week=' + week + '][data-match=' + match + '][data-winner=' + LOCAL + ']').removeClass('list-group-item-success');
+			}
+
+			createTable();
+		});
+	</script>
+</html>
