@@ -28,7 +28,7 @@
 			VISITANTE = 1,
 			EMPATE = 2;
 
-		var CURRENT_WEEK = 10;
+		var CURRENT_WEEK;
 
 		var teams = [
 			[ // zone 1
@@ -388,10 +388,10 @@
 				var result = undefined;
 				for(var m = 0; m < 15; m++) {
 					result = weeks[w][m][2];
-					/*if(result === undefined) { // se bugea si se saltean partidos
+					if(result === undefined && CURRENT_WEEK === undefined) {
 						CURRENT_WEEK = w;
-						break;
-					}*/
+						//break;
+					}
 					if(result !== EMPATE) {
 						winners.push(weeks[w][m][weeks[w][m][2]]);
 					} else {
@@ -525,6 +525,7 @@
 			}
 
 			createTable();
+
 		});
 	</script>
 </html>
